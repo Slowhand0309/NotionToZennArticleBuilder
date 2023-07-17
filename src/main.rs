@@ -1,5 +1,6 @@
-use std::{env, fs::File, io::Read};
+use std::{env, fs::File, fs::copy, io::Read, path::Path};
 
+use percent_encoding::percent_decode_str;
 use regex::Regex;
 
 #[derive(Debug)]
@@ -25,7 +26,26 @@ struct Resource {
 }
 
 fn rename_and_move(resources: &Vec<Resource>) {
-    println!("resources {:?}", resources);
+    for r in resources {
+        println!("resource {:?}", r);
+
+        // デコードして指定されてディレクトリへリネーム&コピー
+        let path = Path::new(&r.old.url);
+        let decoded = percent_decode_str(path.to_str().unwrap()).decode_utf8_lossy();
+        // println!("decoded {:?}", decoded);
+        // let exists = Path::new("res").join(&decoded.to_string()).exists();
+        // println!("exists {:?}", exists);
+
+        // TODO: コピー先のディレクトリ作成
+        let result = copy(Path::new("res").join(&decoded.to_string()).to_str().unwrap(), "res/test.png");
+        println!("result {:?}", result);
+        // let path = Path::new(&r.old.url).parent();
+        // if let Some(path) = path {
+        //     let decoded = percent_decode_str(path.to_str().unwrap()).decode_utf8_lossy();
+        //     println!("decoded {:?}", decoded);
+        //     Path::new("/bin").exists()
+        // }
+    }
 }
 
 fn main() {
