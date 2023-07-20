@@ -1,4 +1,4 @@
-use std::{env, fs::File, fs::copy, fs::create_dir_all, io::Read, path::Path};
+use std::{env, fs::File, fs::copy, fs::create_dir_all, io::{Read, Write}, path::Path};
 
 use percent_encoding::percent_decode_str;
 use regex::Regex;
@@ -33,7 +33,7 @@ fn rename_and_move(resources: &mut Vec<Resource>, article_id: &String) {
         let decoded = percent_decode_str(path.to_str().unwrap()).decode_utf8_lossy();
 
         // コピー先のディレクトリ作成
-        create_dir_all(format!("res/{article_id}")).expect("create dir failed");
+        create_dir_all(format!("res/images/{article_id}")).expect("create dir failed");
         let ext = Path::extension(&path)
                             .expect("get extension failed")
                             .to_str()
@@ -41,15 +41,15 @@ fn rename_and_move(resources: &mut Vec<Resource>, article_id: &String) {
         copy(Path::new("res")
                     .join(&decoded.to_string())
                     .to_str()
-                    .unwrap(), format!("res/{article_id}/image{i}.{ext}")).expect("copy failed");
+                    .unwrap(), format!("res/images/{article_id}/image{i}.{ext}")).expect("copy failed");
 
-        r.new.title = r.old.title.clone();
-        r.new.url = format!("res/{article_id}/image{i}.{ext}");
+        r.new.title = format!("image{i}.{ext}");
+        r.new.url = format!("images/{article_id}/image{i}.{ext}");
         i += 1;
     }
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
     let article_id = &args[2];
@@ -68,4 +68,17 @@ fn main() {
     // リソースを移動しリネームする
     rename_and_move(&mut resources, &article_id);
     println!("resources: {:?}", resources);
+
+    resources.iter().for_each(|r| {
+        let re = Regex::new(&r.old.title).unwrap();
+        contents = re.replace_all(&contents, &r.new.title).to_string();
+        let re = Regex::new(&r.old.url).unwrap();
+        contents = re.replace_all(&contents, &r.new.url).to_string();
+    });
+    println!("contents: {}", contents);
+
+    let mut file = File::create(format!("res/{article_id}.md"))?;
+    file.write_all(&contents.as_bytes())?;
+    file.flush()?;
+    Ok(())
 }
