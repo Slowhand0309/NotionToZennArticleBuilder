@@ -56,7 +56,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     let filename = &args[1];
     let article_id = &args[2];
-    println!("filename {}, article_id {}", filename, article_id);
+    println!("=============================================================");
+    println!("filename: {}, article_id: {}", filename, article_id);
+    println!("=============================================================");
 
     let mut f = File::open(format!("{RES_DIR}/{filename}")).expect("file not found");
     let mut contents = String::new();
@@ -70,15 +72,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // リソースを移動しリネームする
     rename_and_move(&mut resources, &article_id);
-    println!("resources: {:?}", resources);
 
     resources.iter().for_each(|r| {
         let re = Regex::new(&r.old.title).unwrap();
-        contents = re.replace_all(&contents, &r.new.title).to_string();
+        contents = re.replace(&contents, &r.new.title).to_string();
         let re = Regex::new(&r.old.url).unwrap();
-        contents = re.replace_all(&contents, &r.new.url).to_string();
+        contents = re.replace(&contents, &r.new.url).to_string();
     });
-    println!("contents: {}", contents);
 
     let mut file = File::create(format!("{OUTPUT_DIR}/{article_id}.md"))?;
     file.write_all(&contents.as_bytes())?;
