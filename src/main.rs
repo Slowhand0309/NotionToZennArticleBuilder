@@ -52,10 +52,7 @@ fn rename_and_move(resources: &mut Vec<Resource>, article_id: &String) {
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args: Vec<String> = env::args().collect();
-    let filename = &args[1];
-    let article_id = &args[2];
+fn exec(filename: &String, article_id: &String) -> Result<(), Box<dyn std::error::Error>> {
     println!("=============================================================");
     println!("filename: {}, article_id: {}", filename, article_id);
     println!("=============================================================");
@@ -84,4 +81,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     file.write_all(&contents.as_bytes())?;
     file.flush()?;
     Ok(())
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let filename = &args[1];
+    let article_id = &args[2];
+
+    let result = exec(filename, article_id);
+    match result {
+        Ok(_) => println!("success"),
+        Err(e) => println!("error: {:?}", e),
+    }
 }
