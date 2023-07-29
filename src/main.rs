@@ -1,4 +1,5 @@
-use std::{env, fs::File, fs::copy, fs::create_dir_all, io::{Read, Write}, path::Path};
+use std::{fs::File, fs::copy, fs::create_dir_all, io::{Read, Write}, path::Path};
+use clap::Parser;
 
 use percent_encoding::percent_decode_str;
 use regex::Regex;
@@ -83,10 +84,24 @@ fn exec(filename: &String, article_id: &String) -> Result<(), Box<dyn std::error
     Ok(())
 }
 
+#[derive(Parser, Debug)]
+#[command(name = "Notion to Zenn Article Builder")]
+#[command(version = "0.1")]
+#[command(about = "Convert to zenn article format from notion.", long_about = None)]
+struct Args {
+    /// Name of the notion article file.
+    #[arg(short, long)]
+    filename: String,
+
+    /// Zenn article id.
+    #[arg(short, long)]
+    article_id: String,
+}
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let filename = &args[1];
-    let article_id = &args[2];
+    let args = Args::parse();
+    let filename = &args.filename;
+    let article_id = &args.article_id;
 
     let result = exec(filename, article_id);
     match result {
