@@ -35,7 +35,7 @@ fn rename_and_move(resources: &mut Vec<Resource>, article_id: &String) {
         // デコードして指定されてディレクトリへリネーム&コピー
         let path = Path::new(&r.old.url);
         let decoded = percent_decode_str(path.to_str().unwrap()).decode_utf8_lossy();
-
+        println!("old: {}, new: {}", &r.old.url, &decoded);
         // コピー先のディレクトリ作成
         create_dir_all(format!("{OUTPUT_DIR}/images/{article_id}")).expect("create dir failed");
         let ext = Path::extension(&path)
@@ -63,7 +63,7 @@ fn exec(filename: &String, article_id: &String) -> Result<(), Box<dyn std::error
     f.read_to_string(&mut contents).expect("something went wrong reading the file");
 
     let mut resources: Vec<Resource> = Vec::new();
-    let re = Regex::new(r"!\[(.*?)\]\((.*?)\)").unwrap();
+    let re = Regex::new(r"!\[(.*?)\]\((.*?)\)\n").unwrap();
     for caps in re.captures_iter(&contents) {
         resources.push(Resource { old: Meta::from(&caps[1], &caps[2]), new: Meta::empty() });
     }
