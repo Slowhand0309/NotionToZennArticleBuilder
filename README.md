@@ -9,4 +9,5 @@ Notionからエクスポートした記事をZennのフォーマットに変換�
 ## 使い方
 1. Notionからエクスポートしたzipファイルを解凍
 2. res ディレクトリに解凍したファイルを配置
-3. `cargo run res/{記事名} {記事ID}` で実行
+3. `cargo run -- --filename="{記事名}.md" --article-id={記事ID}` で実行
+4. `out` ディレクトリに変換後のファイルが出力される
