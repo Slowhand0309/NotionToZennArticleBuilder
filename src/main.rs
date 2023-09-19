@@ -48,7 +48,7 @@ fn rename_and_move(resources: &mut Vec<Resource>, article_id: &String) {
                     .unwrap(), format!("{OUTPUT_DIR}/images/{article_id}/image{i}.{ext}")).expect("copy failed");
 
         r.new.title = format!("image{i}.{ext}");
-        r.new.url = format!("images/{article_id}/image{i}.{ext}");
+        r.new.url = format!("/images/{article_id}/image{i}.{ext}");
         i += 1;
     }
 }
